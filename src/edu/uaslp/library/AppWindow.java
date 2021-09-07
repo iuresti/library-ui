@@ -1,15 +1,26 @@
 package edu.uaslp.library;
 
+import edu.uaslp.library.model.Book;
+import edu.uaslp.library.model.User;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
 import javax.swing.*;
+
+import edu.uaslp.library.service.BookManager;
+import edu.uaslp.library.service.UserManager;
 
 public class AppWindow {
     private static final int WIDTH = 700;
     private static final int HEIGHT = 600;
     private JLabel studentNameLabel;
     private JLabel bookNameLabel;
+    private UserManager administradorDeUsuarios = new UserManager();
+    private BookManager bookManager = new BookManager();
+    private JTextField studentKey;
+    private JTextField bookKey;
+    private DefaultListModel<String> modelBooks = new DefaultListModel<>();
 
     public void show() {
         JFrame frame = new JFrame("JFrame Example");
@@ -51,14 +62,7 @@ public class AppWindow {
     }
 
     private void addListOfLoans(JPanel panel) {
-        String[] data = new String[4];
-
-        data[0] = "Prestamo 1";
-        data[1] = "Prestamo 2";
-        data[2] = "Prestamo 3";
-        data[3] = "Prestamo 4";
-
-        JList<String> list = new JList<>(data); //data has type Object[]
+        JList<String> list = new JList<>(modelBooks);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
 
@@ -83,7 +87,7 @@ public class AppWindow {
         constraints.gridy = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1;
-        JTextField bookKey = new JTextField();
+        bookKey = new JTextField();
 
         constraints.gridx = 0;
         firstRow.add(labelBookKey, constraints);
@@ -130,7 +134,7 @@ public class AppWindow {
         constraints.weightx = 1;
         firstRow.add(label, constraints);
 
-        JTextField studentKey = new JTextField();
+        studentKey = new JTextField();
         constraints.gridx = 1;
         firstRow.add(studentKey, constraints);
 
@@ -160,19 +164,34 @@ public class AppWindow {
     }
 
     private void queryStudent(ActionEvent event) {
-        JOptionPane.showMessageDialog(null, "Consultando estudiante");
+        String clave = studentKey.getText();
+        User usuario;
+
+        usuario = administradorDeUsuarios.dameUsuarioPorClave(clave);
+
+        studentNameLabel.setText(usuario.getName());
     }
 
     private void addBookToLoan(ActionEvent event) {
-        JOptionPane.showMessageDialog(null, "Añadiendo Libro");
+        String clave = bookKey.getText();
+        Book book = bookManager.dameLibroPorClave(clave);
+
+        modelBooks.addElement(book.getTitle());
     }
 
     private void queryBook(ActionEvent event) {
-        JOptionPane.showMessageDialog(null, "Consultando Libro");
+        String clave = bookKey.getText();
+
+        Book book = bookManager.dameLibroPorClave(clave);
+
+        bookNameLabel.setText(book.getTitle());
     }
 
     private void performLoan(ActionEvent event) {
-        JOptionPane.showMessageDialog(null, "Prestar");
+        int n = modelBooks.size();
+        String nombreDeUsuario = studentNameLabel.getText();
+
+        JOptionPane.showMessageDialog(null, "Se prestaron " + n + " libros a usuario: " + nombreDeUsuario);
     }
 
 }
